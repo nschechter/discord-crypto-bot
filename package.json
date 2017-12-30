@@ -1,0 +1,15 @@
+{
+  "name": "gina-bot",
+  "version": "0.0.1",
+  "description": "Gina Bot - Crypto and Lulz",
+  "main": "bot.js",
+  "repository": "",
+  "author": "GriefSeeds",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.17.1",
+    "cheerio": "^1.0.0-rc.2",
+    "discord.js": "^11.2.1",
+    "ws": "^3.3.2"
+  }
+}
