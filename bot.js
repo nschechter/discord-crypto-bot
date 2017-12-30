@@ -46,27 +46,37 @@ var tickInterval = 30000;
 const bot = new Discord.Client();
 bot.login(auth.token);
 
+// Event Listeners
+
 bot.on('ready', function (evt) {
 
 	console.log('Connected');
 
 	setValues();
-	// updateData();
 	setTimeout(updateData, tickInterval);
 
 });
 
-const setValues = () => {
+bot.on('message', (message) => {
 
+	if (message.content.startsWith('!')) {
+		commandHandler.handleCommands(message);
+	} else {
+		checkMessageAndReact(message);
+	}
+
+});
+
+// Methods
+
+const setValues = () => {
 	// coinMarketCap.addCoin('OST', 'simple-token');
 	GDAX.addCoin('BTC', 'BTC-USD'); // NAME PARAMETER
 	bitGrail.addCoin('XRB', 'BTC-XRB');
-
-	// miscDataToUpdate = [
-	// 	axios.get('https://api.coinmarketcap.com/v1/ticker/?start=100&limit=1000')
-	// ];
 }
 
+
+// Needs a heavy refactor along with the alert handler
 const checkAlerts = () => {
 	let allCoins = getAllCoins();
 	alerter.getAlerts().forEach((alert) => {
@@ -74,8 +84,6 @@ const checkAlerts = () => {
 		if (alert.type === "threshold") {
 			if (!alert.lessThan && coin.price >= alert.threshold) alerter.broadCast(alert);
 			else if (alert.lessThan && coin.price <= alert.threshold) alerter.broadCast(alert);
-		} else if (alert.type === "trend") {
-			
 		}
 	});
 	alerter.cleanAlerts();
@@ -94,6 +102,8 @@ const getCoinFromName = (name) => {
 	return getAllCoins().find((coin) => coin.name === name);
 }
 
+
+// Needs a refactor
 const updateStatusTicker = () => {
 	let btc = getAllCoins().find((coin) => coin.name === 'BTC');
 	getAllCoins().forEach((coin) => {
@@ -110,10 +120,10 @@ const updateData = () => {
 }
 
 const updateCustoms = () => {
-	let customScrapers = [].concat([...CustomScraperHandler.getScrapers(), ...CustomApiHandler.getApis()]);
+	let customScrapersAndApis = [].concat([...CustomScraperHandler.getScrapers(), ...CustomApiHandler.getApis()]);
 
-	return Promise.all(customScrapers.map((customScraper) => customScraper.updater)).then((customs) => {
-		customs.forEach((resolvedScraper) => resolvedScraper.resetUpdater(resolvedScraper));
+	return Promise.all(customScrapersAndApis.map((custom) => custom.updater)).then((customs) => {
+		customs.forEach((resolvedCustom) => resolvedCustom.resetUpdater(resolvedCustom));
 	});
 }
 
@@ -123,22 +133,14 @@ const updateCoins = () => {
 	});
 }
 
-bot.on('message', (message) => {
-
-	if (message.content.startsWith('!')) {
-		commandHandler.handleCommands(message);
-	} else {
-		checkMessageAndReact(message);
-	}
-
-});
-
+// Needs a refactor
 const getPercentageChange = (amt) => {
 	let oldPrice = xrbHistory[xrbHistory.length - 1].price
 	let newPrice = xrbHistory[xrbHistory.length - (amt - 1)].price
 	return (((oldPrice - newPrice) / oldPrice) * 100).toFixed(5);
 }
 
+// Needs a refactor
 const getCustomEmoji = (name) => {
 	return bot.emojis.find((emoji) => emoji.name === name).id;
 }
@@ -152,6 +154,8 @@ const checkMessageAndReact = (message) => {
 		}
 	});
 }
+
+// Getters and Setters
 
 const setTickInterval = (interval) => {
 	tickInterval = interval;
