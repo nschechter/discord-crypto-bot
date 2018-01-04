@@ -30,7 +30,7 @@ const CustomApiHandler = new CustomApis();
 var statusTicker = "XRB";
 var tickInterval = 30000;
 
-const coins = [];
+var coins = [];
 
 // Initialize Discord 
 
@@ -63,30 +63,33 @@ bot.on('message', (message) => {
 const setValues = () => {
 	// BTC data:
 	return Promise.all([
-	this.getCustomApisHandler().addDataPoint('https://api.gdax.com/products/BTC-USD/ticker', 
-		'$..bid', 'BTC-USD', 'BTC'),
-	this.getCustomApisHandler().addDataPoint('https://api.gdax.com/products/BTC-USD/ticker', 
-		'$..volume', 'BTC-USD-volume', 'BTC'),
+	this.getCustomApisHandler().addDataPointOffline('https://api.gdax.com/products/BTC-USD/ticker', 
+		'$..bid', 'USD-price', 'BTC'),
+	this.getCustomApisHandler().addDataPointOffline('https://api.gdax.com/products/BTC-USD/ticker', 
+		'$..volume', 'BTC-volume', 'BTC'),
 	// ETH data:
-	this.getCustomApisHandler().addDataPoint('https://api.gdax.com/products/ETH-USD/ticker',
-		'$..bid', 'ETH-USD', 'ETH'),
-	this.getCustomApisHandler().addDataPoint('https://api.gdax.com/products/ETH-USD/ticker',
-		'$..volume', 'ETH-USD-volume', 'ETH'),
+	this.getCustomApisHandler().addDataPointOffline('https://api.gdax.com/products/ETH-USD/ticker',
+		'$..bid', 'USD-price', 'ETH'),
+	this.getCustomApisHandler().addDataPointOffline('https://api.gdax.com/products/ETH-USD/ticker',
+		'$..volume', 'ETH-volume', 'ETH'),
 	// XRB data:
-	this.getCustomApisHandler().addDataPoint('https://bitgrail.com/api/v1/BTC-XRB/ticker', 
-		'$..bid', 'BTC-XRB', 'XRB'),
-	this.getCustomApisHandler().addDataPoint('https://bitgrail.com/api/v1/BTC-XRB/ticker', 
-		'$..volume', 'BTC-XRB-volume', 'XRB'),
+	this.getCustomApisHandler().addDataPointOffline('https://bitgrail.com/api/v1/BTC-XRB/ticker', 
+		'$..bid', 'BTC-price', 'XRB'),
+	this.getCustomApisHandler().addDataPointOffline('https://bitgrail.com/api/v1/BTC-XRB/ticker', 
+		'$..volume', 'BTC-volume', 'XRB'),
 	// DBC data:
-	this.getCustomApisHandler().addDataPoint('https://api.kucoin.com/v1/DBC-BTC/open/tick',
-		'$..sell', 'BTC-DBC', 'DBC'),
-	this.getCustomApisHandler().addDataPoint('https://api.kucoin.com/v1/DBC-BTC/open/tick',
-		'$..volValue', 'BTC-DBC-volume', 'DBC'),
+	this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/DBC-BTC/open/tick',
+		'$..sell', 'BTC-price', 'DBC'),
+	this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/DBC-BTC/open/tick',
+		'$..volValue', 'BTC-volume', 'DBC'),
 	// BNTY data: 
-	this.getCustomApisHandler().addDataPoint('https://api.kucoin.com/v1/BNTY-BTC/open/tick',
-		'$..sell', 'BTC-BNTY', 'BNTY'),
-	this.getCustomApisHandler().addDataPoint('https://api.kucoin.com/v1/BNTY-BTC/open/tick',
-		'$..volValue', 'BTC-BNTY-volume', 'BNTY')]).then((customs) => customs);
+	this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/BNTY-BTC/open/tick',
+		'$..sell', 'BTC-price', 'BNTY'),
+	this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/BNTY-BTC/open/tick',
+		'$..volValue', 'BTC-volume', 'BNTY')]).then((customs) => {
+		coins = this.getCustomApisHandler().getOrUpdateCoins();
+		return customs;
+	});
 }
 
 // Needs a heavy refactor along with the alert handler
@@ -102,10 +105,6 @@ const checkAlerts = () => {
 	alerter.cleanAlerts();
 }
 
-const buildCoins = () => {
-
-}
-
 // Needs a refactor
 const updateStatusTicker = () => {
 	// let btc = getAllCoins().find((coin) => coin.name === 'BTC');
@@ -117,8 +116,7 @@ const updateStatusTicker = () => {
 }
 
 const updateData = () => {
-	// updateCoins().then(() => console.log('Updated Prices'));
-	updateCustoms().then(() => console.log('Updated Customs'));
+	updateCustoms().then(() => { console.log('Updated Customs'); coins = this.getCustomApisHandler().getOrUpdateCoins(); });
 	setTimeout(updateData, tickInterval);
 }
 
@@ -176,6 +174,20 @@ const getAlert = () => {
 	return alerter;
 }
 
+const getCoins = () => {
+	return coins;
+}
+
+const getCoinFromName = (name) => {
+	let coins = getCoins();
+	return coins[Object.keys(coins).find((coin) => coin === name)];
+}
+
+const getCoinPrice = (name) => {
+	let coin = getCoinFromName(name);
+	return coin[Object.keys(coin).find((key) => key.includes('price'))];
+}
+
 const getCustomScrapersHandler = () => {
 	return CustomScraperHandler;
 }
@@ -190,3 +202,5 @@ module.exports.getCustomScrapersHandler = getCustomScrapersHandler;
 module.exports.getCustomApisHandler = getCustomApisHandler;
 module.exports.setStatus = setStatus;
 module.exports.setTickInterval = setTickInterval;
+module.exports.getCoins = getCoins;
+module.exports.getCoinPrice = getCoinPrice;
