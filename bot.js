@@ -13,10 +13,15 @@ var auth = require('./auth.json');
  * Bot Utilities & Handlers
  */
 var commandHandler = require('./lib/handlers/commandHandler');
-var reactionHandler = require('./lib/handlers/reactionHandler');
-var alertHandler = require('./lib/handlers/alertHandler');
+var Reaction = require('./lib/handlers/reactionHandler');
+var Alert = require('./lib/handlers/alertHandler');
 
-const alerter = new alertHandler();
+const alertHandler = new Alert();
+const reactionHandler = new Reaction([
+	{ keyWords: ['raiblocks', 'xrb'] , emojis: ['💥'] },
+	{ keyWords: ['ripple'], emojis: ['🇱', '🇴', '🇸', '🇪', '🇷'] },
+	{ keyWords: ['joe'] , emojis: ['364473087577554965'] }
+]);
 
 /*
  * Custom Scrapers & Apis
@@ -27,7 +32,7 @@ var CustomApis = require('./lib/apiWrappers/customApis');
 const CustomScraperHandler = new CustomScrapers();
 const CustomApiHandler = new CustomApis();
 
-var statusTicker = "XRB";
+var statusSymbol;
 var tickInterval = 30000;
 
 var coins = [];
@@ -64,75 +69,74 @@ const setValues = () => {
 	// BTC data:
 	return Promise.all([
 	this.getCustomApisHandler().addDataPointOffline('https://api.gdax.com/products/BTC-USD/ticker', 
-		'$..bid', 'USD-price', 'BTC'),
+		'$..ask', 'BTC-USD-price', 'BTC'),
 	this.getCustomApisHandler().addDataPointOffline('https://api.gdax.com/products/BTC-USD/ticker', 
-		'$..volume', 'BTC-volume', 'BTC'),
+		'$..volume', 'BTC-USD-volume', 'BTC'),
 	// ETH data:
 	this.getCustomApisHandler().addDataPointOffline('https://api.gdax.com/products/ETH-USD/ticker',
-		'$..bid', 'USD-price', 'ETH'),
+		'$..ask', 'ETH-USD-price', 'ETH'),
 	this.getCustomApisHandler().addDataPointOffline('https://api.gdax.com/products/ETH-USD/ticker',
-		'$..volume', 'ETH-volume', 'ETH'),
+		'$..volume', 'ETH-USD-volume', 'ETH'),
 	// XRB data:
-	this.getCustomApisHandler().addDataPointOffline('https://bitgrail.com/api/v1/BTC-XRB/ticker', 
-		'$..bid', 'BTC-price', 'XRB'),
-	this.getCustomApisHandler().addDataPointOffline('https://bitgrail.com/api/v1/BTC-XRB/ticker', 
-		'$..volume', 'BTC-volume', 'XRB'),
+	// this.getCustomApisHandler().addDataPointOffline('https://bitgrail.com/api/v1/BTC-XRB/ticker', 
+	// 	'$..ask', 'BTC-price', 'XRB'),
+	// this.getCustomApisHandler().addDataPointOffline('https://bitgrail.com/api/v1/BTC-XRB/ticker', 
+	// 	'$..volume', 'BTC-volume', 'XRB'),
+	this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/XRB-BTC/open/tick',
+		'$..buy', 'XRB-BTC-price', 'XRB'),
+	this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/XRB-BTC/open/tick',
+		'$..volValue', 'XRB-BTC-volume', 'XRB'),
 	// DBC data:
 	this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/DBC-BTC/open/tick',
-		'$..sell', 'BTC-price', 'DBC'),
+		'$..buy', 'DBC-BTC-price', 'DBC'),
 	this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/DBC-BTC/open/tick',
-		'$..volValue', 'BTC-volume', 'DBC'),
+		'$..volValue', 'DBC-BTC-volume', 'DBC'),
 	// BNTY data: 
 	this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/BNTY-BTC/open/tick',
-		'$..sell', 'BTC-price', 'BNTY'),
+		'$..buy', 'BNTY-BTC-price', 'BNTY'),
 	this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/BNTY-BTC/open/tick',
-		'$..volValue', 'BTC-volume', 'BNTY')]).then((customs) => {
+		'$..volValue', 'BNTY-BTC-volume', 'BNTY')]).then((customs) => {
 		coins = this.getCustomApisHandler().getOrUpdateCoins();
+		setStatus('XRB');
 		return customs;
 	});
 }
 
-// Needs a heavy refactor along with the alert handler
-const checkAlerts = () => {
-	let allCoins = getAllCoins();
-	alerter.getAlerts().forEach((alert) => {
-		let coin = allCoins.find((coin) => coin.ticker === alert.ticker);
-		if (alert.type === "threshold") {
-			if (!alert.lessThan && coin.price >= alert.threshold) alerter.broadCast(alert);
-			else if (alert.lessThan && coin.price <= alert.threshold) alerter.broadCast(alert);
-		}
+// EVERY COIN NEEDS A USD PRICE
+const checkAlerts = (dataPoints) => {
+	let alerts = getAlertHandler().getAlerts();
+	alerts.forEach((alert) => {
+		alert.check(getCustomApisHandler().getDataPointByName(alert.dataPointName));
 	});
-	alerter.cleanAlerts();
 }
 
 // Needs a refactor
 const updateStatusTicker = () => {
-	// let btc = getAllCoins().find((coin) => coin.name === 'BTC');
-	// getAllCoins().forEach((coin) => {
-	// 	if (coin.name === statusTicker) {
-	// 		bot.user.setPresence({ game: { name: `${coin.name}: $${coin.price * btc.price}`, type: 0 } });
-	// 	}
-	// });
+	let btcCoin = getCoinFromName('BTC');
+	let coin = getCoinFromName(statusSymbol);
+	let statusCoinPrice = coin[Object.keys(coin).find((key) => key.includes('BTC-price'))];
+	bot.user.setPresence({ game: { name: `${statusSymbol}: $${statusCoinPrice * btcCoin['BTC-USD-price']}`, type: 0 } });
 }
 
 const updateData = () => {
-	updateCustoms().then(() => { console.log('Updated Customs'); coins = this.getCustomApisHandler().getOrUpdateCoins(); });
+	updateCustoms().then(() => { 
+		console.log('Updated Customs');
+		coins = this.getCustomApisHandler().getOrUpdateCoins(); 
+		checkAlerts(getCustomApisHandler().getDataPoints()); 
+		updateStatusTicker(); 
+	});
 	setTimeout(updateData, tickInterval);
 }
 
 const updateCustoms = () => {
 	let customs = [].concat([...CustomScraperHandler.getScrapers(), ...CustomApiHandler.getApis()]);
 
-	return Promise.all(customs.map((custom) => custom.updater)).then((usedCustoms) => {
-		usedCustoms.forEach((resolvedCustom) => resolvedCustom.resetUpdater(resolvedCustom));
-	});
+	return Promise.all(customs.map((custom) => custom.updater).map(p => p.catch(e => e))).then((usedCustoms) => {
+		usedCustoms.forEach((resolvedCustom) => {
+			if (resolvedCustom && resolvedCustom.resetUpdater) resolvedCustom.resetUpdater(resolvedCustom);
+		});
+	}).catch(e => console.log(e));
 }
-
-// const updateCoins = () => {
-// 	return Promise.all(getAllCoins().map((coin) => coin.updater)).then((coins) => {
-// 		coins.forEach((resolvedCoin) => resolvedCoin.resetUpdater(resolvedCoin));
-// 	});
-// }
 
 // Needs a refactor
 const getPercentageChange = (amt) => {
@@ -141,15 +145,10 @@ const getPercentageChange = (amt) => {
 	return (((oldPrice - newPrice) / oldPrice) * 100).toFixed(5);
 }
 
-// Needs a refactor
-const getCustomEmoji = (name) => {
-	return bot.emojis.find((emoji) => emoji.name === name).id;
-}
-
 const checkMessageAndReact = (message) => {
 	if (message.author === bot.user) return;
 
-	reactionHandler.reactions.forEach((reaction) => {
+	reactionHandler.getReactions().forEach((reaction) => {
 		if (reaction.keyWords.some((keyWord) => message.content.toLowerCase().includes(keyWord))) {
 			reactionHandler.reactInLine(message, reaction.emojis);
 		}
@@ -162,16 +161,20 @@ const setTickInterval = (interval) => {
 	tickInterval = interval;
 }
 
-const setStatus = (ticker) => {
-	statusTicker = ticker;
+const setStatus = (symbol) => {
+	let coin = getCoinFromName(symbol);
+	if (coin) {
+		statusSymbol = symbol;
+		return true;
+	} else return false;
 }
 
 const getBot = () => {
 	return bot;
 }
 
-const getAlert = () => {
-	return alerter;
+const getAlertHandler = () => {
+	return alertHandler;
 }
 
 const getCoins = () => {
@@ -180,12 +183,27 @@ const getCoins = () => {
 
 const getCoinFromName = (name) => {
 	let coins = getCoins();
-	return coins[Object.keys(coins).find((coin) => coin === name)];
+	let foundCoin = coins[Object.keys(coins).find((coin) => coin === name)];
+	if (!foundCoin) foundCoin = {};
+	return foundCoin;
 }
 
-const getCoinPrice = (name) => {
-	let coin = getCoinFromName(name);
-	return coin[Object.keys(coin).find((key) => key.includes('price'))];
+// Might want to refactor this. I don't like how it looks
+const getCoinPrice = (name, transfer) => {
+	let coin = getCoinFromName(name.toUpperCase());
+	let key = Object.keys(coin).find((key) => key.includes(`${transfer.toUpperCase()}-price`));
+	if (key) {
+		let price = coin[key];
+		let btcPrice = getCoinFromName('BTC')['USD-price'];
+		let ethPrice = getCoinFromName('ETH')['USD-price'];
+		if (transfer.toUpperCase() === 'BTC') {
+			return `Price (BTC): ${price}\nPrice (USD): $${price * btcPrice}`;
+		} else if (transfer.toUpperCase() === 'ETH') {
+			return `Price (ETH): ${price}\nPrice (USD): $${price * ethPrice}`;
+		}
+	} else {
+		return false;
+	}
 }
 
 const getCustomScrapersHandler = () => {
@@ -196,10 +214,15 @@ const getCustomApisHandler = () => {
 	return CustomApiHandler;
 }
 
+const getReactionsHandler = () => {
+	return reactionHandler();
+}
+
 module.exports.getBot = getBot;
-module.exports.getAlert = getAlert;
+module.exports.getAlertHandler = getAlertHandler;
 module.exports.getCustomScrapersHandler = getCustomScrapersHandler;
 module.exports.getCustomApisHandler = getCustomApisHandler;
+module.exports.getReactionsHandler = getReactionsHandler;
 module.exports.setStatus = setStatus;
 module.exports.setTickInterval = setTickInterval;
 module.exports.getCoins = getCoins;
