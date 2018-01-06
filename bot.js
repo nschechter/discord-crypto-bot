@@ -13,6 +13,7 @@ var auth = require('./auth.json');
  * Bot Utilities & Handlers
  */
 var commandHandler = require('./lib/handlers/commandHandler');
+var dataHandler = require('./lib/handlers/dataHandler');
 var Reaction = require('./lib/handlers/reactionHandler');
 var Alert = require('./lib/handlers/alertHandler');
 
@@ -44,11 +45,12 @@ bot.login(auth.token);
 
 // Event Listeners
 
-bot.on('ready', function (evt) {
+bot.on('ready', (event) => {
 
 	console.log('Connected');
 
-	setValues().then((customs) => console.log(customs));
+	// setValues().then((customs) => console.log(customs));
+	getDataHandler().loadData();
 	setTimeout(updateData, tickInterval);
 
 });
@@ -61,6 +63,11 @@ bot.on('message', (message) => {
 		checkMessageAndReact(message);
 	}
 
+});
+
+bot.on('disconnect', (event) => {
+	if (getDataHandler().saveData()) console.log('Saved data');
+	else console.log('Unable to save data');
 });
 
 // Methods
@@ -96,7 +103,7 @@ const setValues = () => {
 		'$..buy', 'BNTY-BTC-price', 'BNTY'),
 	this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/BNTY-BTC/open/tick',
 		'$..volValue', 'BNTY-BTC-volume', 'BNTY')]).then((customs) => {
-		coins = this.getCustomApisHandler().getOrUpdateCoins();
+		coins = this.getCustomApisHandler().buildCoins();
 		setStatus('XRB');
 		return customs;
 	});
@@ -112,16 +119,15 @@ const checkAlerts = (dataPoints) => {
 
 // Needs a refactor
 const updateStatusTicker = () => {
-	let btcCoin = getCoinFromName('BTC');
 	let coin = getCoinFromName(statusSymbol);
-	let statusCoinPrice = coin[Object.keys(coin).find((key) => key.includes('BTC-price'))];
-	bot.user.setPresence({ game: { name: `${statusSymbol}: $${statusCoinPrice * btcCoin['BTC-USD-price']}`, type: 0 } });
+	let statusCoinPrice = coin[Object.keys(coin).find((key) => key.includes('USD-price'))];
+	bot.user.setPresence({ game: { name: `${statusSymbol}: $${statusCoinPrice}`, type: 0 } });
 }
 
 const updateData = () => {
 	updateCustoms().then(() => { 
 		console.log('Updated Customs');
-		coins = this.getCustomApisHandler().getOrUpdateCoins(); 
+		coins = this.getCustomApisHandler().buildCoins(); 
 		checkAlerts(getCustomApisHandler().getDataPoints()); 
 		updateStatusTicker(); 
 	});
@@ -215,7 +221,11 @@ const getCustomApisHandler = () => {
 }
 
 const getReactionsHandler = () => {
-	return reactionHandler();
+	return reactionHandler;
+}
+
+const getDataHandler = () => {
+	return dataHandler;
 }
 
 module.exports.getBot = getBot;
@@ -223,6 +233,7 @@ module.exports.getAlertHandler = getAlertHandler;
 module.exports.getCustomScrapersHandler = getCustomScrapersHandler;
 module.exports.getCustomApisHandler = getCustomApisHandler;
 module.exports.getReactionsHandler = getReactionsHandler;
+module.exports.getDataHandler = getDataHandler;
 module.exports.setStatus = setStatus;
 module.exports.setTickInterval = setTickInterval;
 module.exports.getCoins = getCoins;
