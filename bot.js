@@ -36,7 +36,7 @@ const CustomApiHandler = new CustomApis();
 var statusSymbol;
 var tickInterval = 30000;
 
-var coins = [];
+var coins;
 
 // Initialize Discord 
 
@@ -48,10 +48,7 @@ bot.login(auth.token);
 bot.on('ready', (event) => {
 
 	console.log('Connected');
-
-	// setValues().then((customs) => console.log(customs));
-	getDataHandler().loadData();
-	setTimeout(updateData, tickInterval);
+	setup();
 
 });
 
@@ -72,44 +69,46 @@ bot.on('disconnect', (event) => {
 
 // Methods
 
-const setValues = () => {
+const setup = () => {
 	// BTC data:
-	return Promise.all([
-	this.getCustomApisHandler().addDataPointOffline('https://api.gdax.com/products/BTC-USD/ticker', 
-		'$..ask', 'BTC-USD-price', 'BTC'),
-	this.getCustomApisHandler().addDataPointOffline('https://api.gdax.com/products/BTC-USD/ticker', 
-		'$..volume', 'BTC-USD-volume', 'BTC'),
-	// ETH data:
-	this.getCustomApisHandler().addDataPointOffline('https://api.gdax.com/products/ETH-USD/ticker',
-		'$..ask', 'ETH-USD-price', 'ETH'),
-	this.getCustomApisHandler().addDataPointOffline('https://api.gdax.com/products/ETH-USD/ticker',
-		'$..volume', 'ETH-USD-volume', 'ETH'),
+	// return Promise.all([
+	// this.getCustomApisHandler().addDataPointOffline('https://api.gdax.com/products/BTC-USD/ticker', 
+	// 	'$..ask', 'BTC-USD-price', 'BTC'),
+	// this.getCustomApisHandler().addDataPointOffline('https://api.gdax.com/products/BTC-USD/ticker', 
+	// 	'$..volume', 'BTC-USD-volume', 'BTC'),
+	// // ETH data:
+	// this.getCustomApisHandler().addDataPointOffline('https://api.gdax.com/products/ETH-USD/ticker',
+	// 	'$..ask', 'ETH-USD-price', 'ETH'),
+	// this.getCustomApisHandler().addDataPointOffline('https://api.gdax.com/products/ETH-USD/ticker',
+	// 	'$..volume', 'ETH-USD-volume', 'ETH'),
 	// XRB data:
 	// this.getCustomApisHandler().addDataPointOffline('https://bitgrail.com/api/v1/BTC-XRB/ticker', 
 	// 	'$..ask', 'BTC-price', 'XRB'),
 	// this.getCustomApisHandler().addDataPointOffline('https://bitgrail.com/api/v1/BTC-XRB/ticker', 
 	// 	'$..volume', 'BTC-volume', 'XRB'),
-	this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/XRB-BTC/open/tick',
-		'$..buy', 'XRB-BTC-price', 'XRB'),
-	this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/XRB-BTC/open/tick',
-		'$..volValue', 'XRB-BTC-volume', 'XRB'),
-	// DBC data:
-	this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/DBC-BTC/open/tick',
-		'$..buy', 'DBC-BTC-price', 'DBC'),
-	this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/DBC-BTC/open/tick',
-		'$..volValue', 'DBC-BTC-volume', 'DBC'),
-	// BNTY data: 
-	this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/BNTY-BTC/open/tick',
-		'$..buy', 'BNTY-BTC-price', 'BNTY'),
-	this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/BNTY-BTC/open/tick',
-		'$..volValue', 'BNTY-BTC-volume', 'BNTY')]).then((customs) => {
-		coins = this.getCustomApisHandler().buildCoins();
-		setStatus('XRB');
-		return customs;
-	});
+	// this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/XRB-BTC/open/tick',
+	// 	'$..buy', 'XRB-BTC-price', 'XRB'),
+	// this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/XRB-BTC/open/tick',
+	// 	'$..volValue', 'XRB-BTC-volume', 'XRB'),
+	// // DBC data:
+	// this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/DBC-BTC/open/tick',
+	// 	'$..buy', 'DBC-BTC-price', 'DBC'),
+	// this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/DBC-BTC/open/tick',
+	// 	'$..volValue', 'DBC-BTC-volume', 'DBC'),
+	// // BNTY data: 
+	// this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/BNTY-BTC/open/tick',
+	// 	'$..buy', 'BNTY-BTC-price', 'BNTY'),
+	// this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/BNTY-BTC/open/tick',
+	// 	'$..volValue', 'BNTY-BTC-volume', 'BNTY')]).then((customs) => {
+	// 	coins = this.getCustomApisHandler().buildCoins();
+	// 	return customs;
+	// });
+	coins = [];
+	getDataHandler().loadData();
+	setStatus('XRB');
+	setTimeout(updateData, tickInterval);
 }
 
-// EVERY COIN NEEDS A USD PRICE
 const checkAlerts = (dataPoints) => {
 	let alerts = getAlertHandler().getAlerts();
 	alerts.forEach((alert) => {
@@ -129,7 +128,7 @@ const updateData = () => {
 		console.log('Updated Customs');
 		coins = this.getCustomApisHandler().buildCoins(); 
 		checkAlerts(getCustomApisHandler().getDataPoints()); 
-		updateStatusTicker(); 
+		updateStatusTicker();
 	});
 	setTimeout(updateData, tickInterval);
 }
@@ -187,6 +186,11 @@ const getCoins = () => {
 	return coins;
 }
 
+// this is fucking terrible I need to move this
+const setCoins = (newCoins) => {
+	coins = newCoins;
+}
+
 const getCoinFromName = (name) => {
 	let coins = getCoins();
 	let foundCoin = coins[Object.keys(coins).find((coin) => coin === name)];
@@ -237,4 +241,6 @@ module.exports.getDataHandler = getDataHandler;
 module.exports.setStatus = setStatus;
 module.exports.setTickInterval = setTickInterval;
 module.exports.getCoins = getCoins;
+module.exports.setCoins = setCoins;
 module.exports.getCoinPrice = getCoinPrice;
+module.exports.updateStatusTicker = updateStatusTicker;
