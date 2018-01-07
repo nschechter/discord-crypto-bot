@@ -204,9 +204,9 @@ const getCoinFromName = (name) => {
 }
 
 // Might want to refactor this. I don't like how it looks
-const getCoinPrice = (name, transfer) => {
+const getCoinPrice2 = (name, transfer) => {
 	let coin = getCoinFromName(name.toUpperCase());
-	let key = Object.keys(coin).find((key) => key.includes(`${transfer.toUpperCase()}-price`));
+	let key = Object.keys(coin).find((key) => key.includes(`${coin.name}-price`));
 	if (key) {
 		let price = coin[key];
 		let btcPrice = getCoinFromName('BTC')['USD-price'];
@@ -218,6 +218,17 @@ const getCoinPrice = (name, transfer) => {
 		}
 	} else {
 		return false;
+	}
+}
+
+const getCoinPrice = (name, transfer) => {
+	let coin = getCoinFromName(name.toUpperCase());
+	let price = coin[`${name}-${transfer.toUpperCase()}-price`];
+	if (price) {
+		if (transfer.toUpperCase() === 'USD')
+			return `Price (USD): $${price}`;
+		else
+			return `Price (${transfer.toUpperCase()}): ${price}`;
 	}
 }
 
