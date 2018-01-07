@@ -18,11 +18,12 @@ var Reaction = require('./lib/handlers/reactionHandler');
 var Alert = require('./lib/handlers/alertHandler');
 
 const alertHandler = new Alert();
-const reactionHandler = new Reaction([
-	{ keyWords: ['raiblocks', 'xrb'] , emojis: ['💥'] },
-	{ keyWords: ['ripple'], emojis: ['🇱', '🇴', '🇸', '🇪', '🇷'] },
-	{ keyWords: ['joe'] , emojis: ['364473087577554965'] }
-]);
+const reactionHandler = new Reaction({
+	'raiblocks': ['💥'],
+	'xrb': ['💥'],
+	'ripple': ['🇱', '🇴', '🇸', '🇪', '🇷'],
+	'joe': ['364473087577554965']
+});
 
 /*
  * Custom Scrapers & Apis
@@ -35,6 +36,7 @@ const CustomApiHandler = new CustomApis();
 
 var statusSymbol;
 var tickInterval = 30000;
+var tick = 0;
 
 var coins;
 
@@ -130,6 +132,11 @@ const updateData = () => {
 		checkAlerts(getCustomApisHandler().getDataPoints()); 
 		updateStatusTicker();
 	});
+	tick = tick + 1;
+	if (tick == 5) {
+		tick = 0;
+		if (getDataHandler().saveData()) console.log('Saved data.');
+	}
 	setTimeout(updateData, tickInterval);
 }
 
@@ -153,11 +160,9 @@ const getPercentageChange = (amt) => {
 const checkMessageAndReact = (message) => {
 	if (message.author === bot.user) return;
 
-	reactionHandler.getReactions().forEach((reaction) => {
-		if (reaction.keyWords.some((keyWord) => message.content.toLowerCase().includes(keyWord))) {
-			reactionHandler.reactInLine(message, reaction.emojis);
-		}
-	});
+	let reactions = reactionHandler.getReactions();
+	if (reactions[message.content.toLowerCase()])
+		reactionHandler.reactInLine(message, reactions[message.content.toLowerCase()]);
 }
 
 // Getters and Setters
@@ -224,7 +229,7 @@ const getCustomApisHandler = () => {
 	return CustomApiHandler;
 }
 
-const getReactionsHandler = () => {
+const getReactionHandler = () => {
 	return reactionHandler;
 }
 
@@ -236,7 +241,7 @@ module.exports.getBot = getBot;
 module.exports.getAlertHandler = getAlertHandler;
 module.exports.getCustomScrapersHandler = getCustomScrapersHandler;
 module.exports.getCustomApisHandler = getCustomApisHandler;
-module.exports.getReactionsHandler = getReactionsHandler;
+module.exports.getReactionHandler = getReactionHandler;
 module.exports.getDataHandler = getDataHandler;
 module.exports.setStatus = setStatus;
 module.exports.setTickInterval = setTickInterval;
