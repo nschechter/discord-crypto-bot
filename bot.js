@@ -111,27 +111,27 @@ const setup = () => {
 	setTimeout(updateData, tickInterval);
 }
 
-const checkAlerts = (dataPoints) => {
+const checkAlerts = () => {
 	let alerts = getAlertHandler().getAlerts();
 	alerts.forEach((alert) => {
 		alert.check(getCustomApisHandler().getDataPointByName(alert.dataPointName));
 	});
 }
 
-// Needs a refactor
 const updateStatusTicker = () => {
 	let coin = getCoinFromName(statusSymbol);
-	let statusCoinPrice = coin[Object.keys(coin).find((key) => key.includes('USD-price'))];
-	bot.user.setPresence({ game: { name: `${statusSymbol}: $${statusCoinPrice}`, type: 0 } });
+	let coinPrice = coin[Object.keys(coin).find((key) => key.includes('USD-price'))];
+	bot.user.setPresence({ game: { name: `${statusSymbol}: $${coinPrice}`, type: 0 } });
 }
 
 const updateData = () => {
 	updateCustoms().then(() => { 
 		console.log('Updated Customs');
 		coins = this.getCustomApisHandler().buildCoins(); 
-		checkAlerts(getCustomApisHandler().getDataPoints()); 
+		checkAlerts(); 
 		updateStatusTicker();
 	});
+	
 	tick = tick + 1;
 	if (tick == 5) {
 		tick = 0;
