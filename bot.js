@@ -203,23 +203,23 @@ const getCoinFromName = (name) => {
 	return foundCoin;
 }
 
-// Might want to refactor this. I don't like how it looks
-const getCoinPrice2 = (name, transfer) => {
-	let coin = getCoinFromName(name.toUpperCase());
-	let key = Object.keys(coin).find((key) => key.includes(`${coin.name}-price`));
-	if (key) {
-		let price = coin[key];
-		let btcPrice = getCoinFromName('BTC')['USD-price'];
-		let ethPrice = getCoinFromName('ETH')['USD-price'];
-		if (transfer.toUpperCase() === 'BTC') {
-			return `Price (BTC): ${price}\nPrice (USD): $${price * btcPrice}`;
-		} else if (transfer.toUpperCase() === 'ETH') {
-			return `Price (ETH): ${price}\nPrice (USD): $${price * ethPrice}`;
-		}
-	} else {
-		return false;
-	}
-}
+// Deprecated
+// const getCoinPrice2 = (name, transfer) => {
+// 	let coin = getCoinFromName(name.toUpperCase());
+// 	let key = Object.keys(coin).find((key) => key.includes(`${coin.name}-price`));
+// 	if (key) {
+// 		let price = coin[key];
+// 		let btcPrice = getCoinFromName('BTC')['USD-price'];
+// 		let ethPrice = getCoinFromName('ETH')['USD-price'];
+// 		if (transfer.toUpperCase() === 'BTC') {
+// 			return `Price (BTC): ${price}\nPrice (USD): $${price * btcPrice}`;
+// 		} else if (transfer.toUpperCase() === 'ETH') {
+// 			return `Price (ETH): ${price}\nPrice (USD): $${price * ethPrice}`;
+// 		}
+// 	} else {
+// 		return false;
+// 	}
+// }
 
 const getCoinPrice = (name, transfer) => {
 	let coin = getCoinFromName(name.toUpperCase());
