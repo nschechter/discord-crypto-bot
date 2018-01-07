@@ -224,7 +224,6 @@ const getCoinFromName = (name) => {
 const getCoinPrice = (name, transfer) => {
 	let coin = getCoinFromName(name.toUpperCase());
 	let price = coin[`${name}-${transfer.toUpperCase()}-price`];
-	debugger;
 	if (price) {
 		if (transfer.toUpperCase() === 'USD')
 			return `Price (USD): $${price}`;
