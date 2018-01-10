@@ -1,0 +1,82 @@
+{
+  "apis": [
+    {
+      "url": "https://api.gdax.com/products/BTC-USD/ticker",
+      "dataPoints": [
+        {
+          "coin": "BTC",
+          "name": "BTC-USD-price",
+          "selector": "$..ask",
+          "value": "14299.7"
+        },
+        {
+          "coin": "BTC",
+          "name": "BTC-USD-volume",
+          "selector": "$..volume",
+          "value": "17191.40543893"
+        }
+      ],
+      "updater": {}
+    },
+    {
+      "url": "https://api.gdax.com/products/ETH-USD/ticker",
+      "dataPoints": [
+        {
+          "coin": "ETH",
+          "name": "ETH-USD-price",
+          "selector": "$..ask",
+          "value": "1342.16"
+        },
+        {
+          "coin": "ETH",
+          "name": "ETH-USD-volume",
+          "selector": "$..volume",
+          "value": "313706.33809722"
+        }
+      ],
+      "updater": {}
+    },
+    {
+      "url": "https://api.kucoin.com/v1/open/tick",
+      "dataPoints": [
+        {
+          "coin": "XRB",
+          "name": "XRB-ETH-price",
+          "selector": "$..data[?(@.symbol==\"XRB-ETH\")].buy",
+          "value": 0.0221
+        },
+        {
+          "coin": "XRB",
+          "name": "XRB-ETH-volume",
+          "selector": "$..data[?(@.symbol==\"XRB-ETH\")].volValue",
+          "value": 5034.05411592
+        },
+        {
+          "coin": "BNTY",
+          "name": "BNTY-BTC-price",
+          "selector": "$..data[?(@.symbol==\"BNTY-BTC\")].buy",
+          "value": 0.000052
+        },
+        {
+          "coin": "BNTY",
+          "name": "BNTY-BTC-volume",
+          "selector": "$..data[?(@.symbol==\"BNTY-BTC\")].volValue",
+          "value": 189.57851525
+        },
+        {
+          "coin": "DBC",
+          "name": "DBC-BTC-price",
+          "selector": "$..data[?(@.symbol==\"DBC-BTC\")].buy",
+          "value": 0.00003901
+        },
+        {
+          "coin": "DBC",
+          "name": "DBC-BTC-volume",
+          "selector": "$..data[?(@.symbol==\"DBC-BTC\")].volValue",
+          "value": 1842.93598485
+        }
+      ],
+      "updater": {}
+    }
+  ]
+}

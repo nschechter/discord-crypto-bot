@@ -37,6 +37,7 @@ const CustomApiHandler = new CustomApis();
 var statusSymbol;
 var tickInterval = 30000;
 var tick = 0;
+var startDate;
 
 var coins;
 
@@ -50,6 +51,7 @@ bot.login(auth.token);
 bot.on('ready', (event) => {
 
 	console.log('Connected');
+	startDate = Date.now();
 	setup();
 
 });
@@ -114,7 +116,8 @@ const setup = () => {
 const checkAlerts = () => {
 	let alerts = getAlertHandler().getAlerts();
 	alerts.forEach((alert) => {
-		alert.check(getCustomApisHandler().getDataPointByName(alert.dataPointName));
+		let dataPoint = getCustomApisHandler().getDataPointByName(alert.dataPointName)
+		if (dataPoint) alert.check(dataPoint);
 	});
 }
 
@@ -248,6 +251,10 @@ const getDataHandler = () => {
 	return dataHandler;
 }
 
+const getStartDate = () => {
+	return startDate;
+}
+
 module.exports.getBot = getBot;
 module.exports.getAlertHandler = getAlertHandler;
 module.exports.getCustomScrapersHandler = getCustomScrapersHandler;
@@ -260,3 +267,4 @@ module.exports.getCoins = getCoins;
 module.exports.setCoins = setCoins;
 module.exports.getCoinPrice = getCoinPrice;
 module.exports.updateStatusTicker = updateStatusTicker;
+module.exports.getStartDate = getStartDate;
