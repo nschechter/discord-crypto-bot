@@ -164,8 +164,8 @@ const checkMessageAndReact = (message) => {
 	if (message.author === bot.user) return;
 
 	let reactions = reactionHandler.getReactions();
-	if (reactions[message.content.toLowerCase()])
-		reactionHandler.reactInLine(message, reactions[message.content.toLowerCase()]);
+	let result = message.content.toLowerCase().split(' ').find((word) => Object.keys(reactions).includes(word));
+	if (result) reactionHandler.reactInLine(message, reactions[result]);
 }
 
 // Getters and Setters
