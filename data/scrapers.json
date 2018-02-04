@@ -1,3 +1,16 @@
 {
-  "scrapers": []
+  "customs": [
+    {
+      "url": "https://coinmarketcap.com/currencies/axpire/#markets",
+      "dataPoints": [
+        {
+          "name": "axpire_price",
+          "selector": "//*[@id=\"quote_price\"]/span[1]",
+          "value": "0.063165",
+          "activated": true
+        }
+      ],
+      "updater": {}
+    }
+  ]
 }
