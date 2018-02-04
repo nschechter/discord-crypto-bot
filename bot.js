@@ -31,7 +31,7 @@ const reactionHandler = new Reaction({
 var CustomScrapers = require('./lib/apiWrappers/customScrapers');
 var CustomApis = require('./lib/apiWrappers/customApis');
 
-const CustomScraperHandler = new CustomScrapers();
+const CustomScraperHandler = new CustomScrapers([]);
 const CustomApiHandler = new CustomApis();
 
 var statusSymbol;
@@ -144,7 +144,7 @@ const updateData = () => {
 }
 
 const updateCustoms = () => {
-	let customs = [].concat([...CustomScraperHandler.getScrapers(), ...CustomApiHandler.getApis()]);
+	let customs = [].concat([...CustomScraperHandler.getCustoms(), ...CustomApiHandler.getCustoms()]);
 
 	return Promise.all(customs.map((custom) => custom.updater).map(p => p.catch(e => e))).then((usedCustoms) => {
 		usedCustoms.forEach((resolvedCustom) => {
@@ -164,8 +164,8 @@ const checkMessageAndReact = (message) => {
 	if (message.author === bot.user) return;
 
 	let reactions = reactionHandler.getReactions();
-	if (reactions[message.content.toLowerCase()])
-		reactionHandler.reactInLine(message, reactions[message.content.toLowerCase()]);
+	let result = message.content.toLowerCase().split(' ').find((word) => Object.keys(reactions).includes(word));
+	if (result) reactionHandler.reactInLine(message, reactions[result]);
 }
 
 // Getters and Setters
@@ -205,24 +205,6 @@ const getCoinFromName = (name) => {
 	if (!foundCoin) foundCoin = {};
 	return foundCoin;
 }
-
-// Deprecated
-// const getCoinPrice2 = (name, transfer) => {
-// 	let coin = getCoinFromName(name.toUpperCase());
-// 	let key = Object.keys(coin).find((key) => key.includes(`${coin.name}-price`));
-// 	if (key) {
-// 		let price = coin[key];
-// 		let btcPrice = getCoinFromName('BTC')['USD-price'];
-// 		let ethPrice = getCoinFromName('ETH')['USD-price'];
-// 		if (transfer.toUpperCase() === 'BTC') {
-// 			return `Price (BTC): ${price}\nPrice (USD): $${price * btcPrice}`;
-// 		} else if (transfer.toUpperCase() === 'ETH') {
-// 			return `Price (ETH): ${price}\nPrice (USD): $${price * ethPrice}`;
-// 		}
-// 	} else {
-// 		return false;
-// 	}
-// }
 
 const getCoinPrice = (name, transfer) => {
 	let coin = getCoinFromName(name.toUpperCase());
