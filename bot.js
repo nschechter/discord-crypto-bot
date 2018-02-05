@@ -18,12 +18,7 @@ var Reaction = require('./lib/handlers/reactionHandler');
 var Alert = require('./lib/handlers/alertHandler');
 
 const alertHandler = new Alert();
-const reactionHandler = new Reaction({
-	'raiblocks': ['💥'],
-	'xrb': ['💥'],
-	'ripple': ['🇱', '🇴', '🇸', '🇪', '🇷'],
-	'joe': ['364473087577554965']
-});
+const reactionHandler = new Reaction();
 
 /*
  * Custom Scrapers & Apis
