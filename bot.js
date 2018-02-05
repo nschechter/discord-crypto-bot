@@ -18,12 +18,7 @@ var Reaction = require('./lib/handlers/reactionHandler');
 var Alert = require('./lib/handlers/alertHandler');
 
 const alertHandler = new Alert();
-const reactionHandler = new Reaction({
-	'raiblocks': ['💥'],
-	'xrb': ['💥'],
-	'ripple': ['🇱', '🇴', '🇸', '🇪', '🇷'],
-	'joe': ['364473087577554965']
-});
+const reactionHandler = new Reaction();
 
 /*
  * Custom Scrapers & Apis
@@ -74,39 +69,6 @@ bot.on('disconnect', (event) => {
 // Methods
 
 const setup = () => {
-	// BTC data:
-	// return Promise.all([
-	// this.getCustomApisHandler().addDataPointOffline('https://api.gdax.com/products/BTC-USD/ticker', 
-	// 	'$..ask', 'BTC-USD-price', 'BTC'),
-	// this.getCustomApisHandler().addDataPointOffline('https://api.gdax.com/products/BTC-USD/ticker', 
-	// 	'$..volume', 'BTC-USD-volume', 'BTC'),
-	// // ETH data:
-	// this.getCustomApisHandler().addDataPointOffline('https://api.gdax.com/products/ETH-USD/ticker',
-	// 	'$..ask', 'ETH-USD-price', 'ETH'),
-	// this.getCustomApisHandler().addDataPointOffline('https://api.gdax.com/products/ETH-USD/ticker',
-	// 	'$..volume', 'ETH-USD-volume', 'ETH'),
-	// XRB data:
-	// this.getCustomApisHandler().addDataPointOffline('https://bitgrail.com/api/v1/BTC-XRB/ticker', 
-	// 	'$..ask', 'BTC-price', 'XRB'),
-	// this.getCustomApisHandler().addDataPointOffline('https://bitgrail.com/api/v1/BTC-XRB/ticker', 
-	// 	'$..volume', 'BTC-volume', 'XRB'),
-	// this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/XRB-BTC/open/tick',
-	// 	'$..buy', 'XRB-BTC-price', 'XRB'),
-	// this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/XRB-BTC/open/tick',
-	// 	'$..volValue', 'XRB-BTC-volume', 'XRB'),
-	// // DBC data:
-	// this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/DBC-BTC/open/tick',
-	// 	'$..buy', 'DBC-BTC-price', 'DBC'),
-	// this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/DBC-BTC/open/tick',
-	// 	'$..volValue', 'DBC-BTC-volume', 'DBC'),
-	// // BNTY data: 
-	// this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/BNTY-BTC/open/tick',
-	// 	'$..buy', 'BNTY-BTC-price', 'BNTY'),
-	// this.getCustomApisHandler().addDataPointOffline('https://api.kucoin.com/v1/BNTY-BTC/open/tick',
-	// 	'$..volValue', 'BNTY-BTC-volume', 'BNTY')]).then((customs) => {
-	// 	coins = this.getCustomApisHandler().buildCoins();
-	// 	return customs;
-	// });
 	coins = [];
 	getDataHandler().loadData();
 	setStatus('XRB');
