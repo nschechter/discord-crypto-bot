@@ -52,6 +52,7 @@ bot.on('ready', (event) => {
 });
 
 bot.on('message', (message) => {
+	if (message.author.bot) return;
 
 	if (message.content.startsWith('!')) {
 		commandHandler.handleCommands(message);
@@ -199,6 +200,11 @@ const getStartDate = () => {
 	return startDate;
 }
 
+const getDataPointByName = (custom, name) => {
+	if (custom === "jsonpath") return this.getCustomApisHandler().getCustoms().reduce((arr, custom) => arr.concat(custom.dataPoints), []).find((dataPoint) => dataPoint.name === name);
+	else if (custom === "xpath") return this.getCustomScrapersHandler().getCustoms().reduce((arr, custom) => arr.concat(custom.dataPoints), []).find((dataPoint) => dataPoint.name === name);
+}
+
 module.exports.getBot = getBot;
 module.exports.getAlertHandler = getAlertHandler;
 module.exports.getCustomScrapersHandler = getCustomScrapersHandler;
@@ -212,3 +218,4 @@ module.exports.setCoins = setCoins;
 module.exports.getCoinPrice = getCoinPrice;
 module.exports.updateStatusTicker = updateStatusTicker;
 module.exports.getStartDate = getStartDate;
+module.exports.getDataPointByName = getDataPointByName;

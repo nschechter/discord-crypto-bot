@@ -6,8 +6,8 @@
         {
           "name": "axpire_price",
           "selector": "//*[@id=\"quote_price\"]/span[1]",
-          "value": "0.061671",
-          "activated": true
+          "value": "0.067441",
+          "activated": false
         }
       ],
       "updater": {}
