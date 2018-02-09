@@ -72,14 +72,14 @@ bot.on('disconnect', (event) => {
 const setup = () => {
 	coins = [];
 	getDataHandler().loadData();
-	setStatus('XRB');
+	setStatus('NANO');
 	setTimeout(updateData, tickInterval);
 }
 
 const checkAlerts = () => {
 	let alerts = getAlertHandler().getAlerts();
 	alerts.forEach((alert) => {
-		let dataPoint = getCustomApisHandler().getDataPointByName(alert.dataPointName)
+		let dataPoint = getDataPointByName('all', alert.dataPointName);
 		if (dataPoint) alert.check(dataPoint);
 	});
 }
@@ -157,7 +157,6 @@ const getCoins = () => {
 	return coins;
 }
 
-// this is fucking terrible I need to move this
 const setCoins = (newCoins) => {
 	coins = newCoins;
 }
@@ -203,6 +202,7 @@ const getStartDate = () => {
 const getDataPointByName = (custom, name) => {
 	if (custom === "jsonpath") return this.getCustomApisHandler().getCustoms().reduce((arr, custom) => arr.concat(custom.dataPoints), []).find((dataPoint) => dataPoint.name === name);
 	else if (custom === "xpath") return this.getCustomScrapersHandler().getCustoms().reduce((arr, custom) => arr.concat(custom.dataPoints), []).find((dataPoint) => dataPoint.name === name);
+	else if (custom === "all") return [...this.getCustomApisHandler().getCustoms().reduce((arr, custom) => arr.concat(custom.dataPoints), []), this.getCustomScrapersHandler().getCustoms().reduce((arr, custom) => arr.concat(custom.dataPoints), [])].find((dataPoint) => dataPoint.name === name);
 }
 
 module.exports.getBot = getBot;
