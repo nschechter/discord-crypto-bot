@@ -7,14 +7,14 @@
           "coin": "BTC",
           "name": "BTC-USD-price",
           "selector": "$..ask",
-          "value": "8132.09",
+          "value": "8552.01",
           "activated": true
         },
         {
           "coin": "BTC",
           "name": "BTC-USD-volume",
           "selector": "$..volume",
-          "value": "25852.64631661",
+          "value": "28389.48364887",
           "activated": true
         }
       ],
@@ -27,14 +27,14 @@
           "coin": "ETH",
           "name": "ETH-USD-price",
           "selector": "$..ask",
-          "value": "837",
+          "value": "863.63",
           "activated": true
         },
         {
           "coin": "ETH",
           "name": "ETH-USD-volume",
           "selector": "$..volume",
-          "value": "232960.50157277",
+          "value": "167556.91262656",
           "activated": true
         }
       ],
@@ -47,42 +47,42 @@
           "coin": "XRB",
           "name": "XRB-ETH-price",
           "selector": "$..data[?(@.symbol==\"XRB-ETH\")].buy",
-          "value": 0.014614,
+          "value": 0.013104,
           "activated": true
         },
         {
           "coin": "XRB",
           "name": "XRB-ETH-volume",
           "selector": "$..data[?(@.symbol==\"XRB-ETH\")].volValue",
-          "value": 1567.79008395,
+          "value": 634.58998211,
           "activated": true
         },
         {
           "coin": "BNTY",
           "name": "BNTY-BTC-price",
           "selector": "$..data[?(@.symbol==\"BNTY-BTC\")].buy",
-          "value": 0.00001525,
+          "value": 0.00001879,
           "activated": true
         },
         {
           "coin": "BNTY",
           "name": "BNTY-BTC-volume",
           "selector": "$..data[?(@.symbol==\"BNTY-BTC\")].volValue",
-          "value": 18.95426632,
+          "value": 16.52756798,
           "activated": true
         },
         {
           "coin": "DBC",
           "name": "DBC-BTC-price",
           "selector": "$..data[?(@.symbol==\"DBC-BTC\")].buy",
-          "value": 0.00001076,
+          "value": 0.0000114,
           "activated": true
         },
         {
           "coin": "DBC",
           "name": "DBC-BTC-volume",
           "selector": "$..data[?(@.symbol==\"DBC-BTC\")].volValue",
-          "value": 60.87895225,
+          "value": 48.10345191,
           "activated": true
         }
       ],

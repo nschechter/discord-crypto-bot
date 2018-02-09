@@ -52,6 +52,7 @@ bot.on('ready', (event) => {
 });
 
 bot.on('message', (message) => {
+	if (message.author.bot) return;
 
 	if (message.content.startsWith('!')) {
 		commandHandler.handleCommands(message);
@@ -200,8 +201,8 @@ const getStartDate = () => {
 }
 
 const getDataPointByName = (custom, name) => {
-	if (custom === "jsonpath") return this.getCustomApisHandler().getCustoms().reduce((arr, item) => return arr.concat(custom.dataPoints), []);
-	else if (custom === "xpath") return this.getCustomScrapersHandler().getCustoms().reduce((arr, item) => return arr.concat(custom.dataPoints), []);
+	if (custom === "jsonpath") return this.getCustomApisHandler().getCustoms().reduce((arr, custom) => arr.concat(custom.dataPoints), []).find((dataPoint) => dataPoint.name === name);
+	else if (custom === "xpath") return this.getCustomScrapersHandler().getCustoms().reduce((arr, custom) => arr.concat(custom.dataPoints), []).find((dataPoint) => dataPoint.name === name);
 }
 
 module.exports.getBot = getBot;
