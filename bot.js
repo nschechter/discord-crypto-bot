@@ -199,6 +199,11 @@ const getStartDate = () => {
 	return startDate;
 }
 
+const getDataPointByName = (custom, name) => {
+	if (custom === "jsonpath") return this.getCustomApisHandler().getCustoms().reduce((arr, item) => return arr.concat(custom.dataPoints), []);
+	else if (custom === "xpath") return this.getCustomScrapersHandler().getCustoms().reduce((arr, item) => return arr.concat(custom.dataPoints), []);
+}
+
 module.exports.getBot = getBot;
 module.exports.getAlertHandler = getAlertHandler;
 module.exports.getCustomScrapersHandler = getCustomScrapersHandler;
@@ -212,3 +217,4 @@ module.exports.setCoins = setCoins;
 module.exports.getCoinPrice = getCoinPrice;
 module.exports.updateStatusTicker = updateStatusTicker;
 module.exports.getStartDate = getStartDate;
+module.exports.getDataPointByName = getDataPointByName;
